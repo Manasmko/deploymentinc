@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manas Ojha — Builder · Deployment Inc</title>
+<meta name="description" content="I've been a forward-deployed engineer for two years. Nobody gave me the title.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#000000;
+  --panel:#08080A;
+  --panel-2:#0C0C0F;
+  --line:#1A1A1F;
+  --line-2:#232329;
+  --txt:#FFFFFF;
+  --mut:#8A8A92;
+  --mut-2:#5E5E66;
+  --spec:linear-gradient(90deg,#3B82F6 0%,#22C55E 34%,#EAB308 64%,#F97316 100%);
+  --chrome:linear-gradient(178deg,#FFFFFF 0%,#EDEDF2 26%,#9C9CA6 52%,#F4F4F8 70%,#AEAEB8 100%);
+  --maxw:1160px;
+  --pad:clamp(20px,5vw,60px);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;font-size:16.5px;line-height:1.6;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 var(--pad)}
+.mono{font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase}
+.chrome{background:var(--chrome);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
+.specrule{height:2px;background:var(--spec);border:0}
+.specrule.thin{height:1px}
+
+/* RAIL */
+.rail{position:fixed;top:0;left:0;right:0;z-index:60;background:rgba(0,0,0,.78);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid var(--line)}
+.rail-in{max-width:var(--maxw);margin:0 auto;padding:11px var(--pad);display:flex;align-items:center;gap:15px}
+.rail .nm{font-weight:600;color:#fff}
+.rail .sp{color:var(--mut-2)}
+.rail .cur{color:var(--mut);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rail .lv{display:flex;align-items:center;gap:8px;color:var(--mut);flex-shrink:0}
+.dot{width:6px;height:6px;border-radius:50%;background:#22C55E;animation:pulse 2.8s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(34,197,94,.5)}70%{box-shadow:0 0 0 7px rgba(34,197,94,0)}100%{box-shadow:0 0 0 0 rgba(34,197,94,0)}}
+@media(max-width:680px){.rail .lv span{display:none}}
+
+/* HERO */
+.hero{padding:168px 0 92px;position:relative;overflow:hidden}
+.hero .wrap{position:relative;z-index:2}
+.eyebrow{color:var(--mut);margin-bottom:36px;display:flex;flex-wrap:wrap;gap:9px 18px}
+.eyebrow b{color:#fff;font-weight:500}
+h1{font-size:clamp(2.5rem,6.6vw,5.2rem);line-height:.96;letter-spacing:-.042em;font-weight:800}
+h1 .l2{display:block;color:var(--mut);font-weight:700;letter-spacing:-.04em}
+.strike{position:relative;display:inline-block;color:var(--mut-2);font-weight:700}
+.strike::after{content:'';position:absolute;left:-2%;right:-2%;top:52%;height:3px;background:var(--spec);border-radius:2px}
+.hero-sub{margin-top:32px;max-width:52ch;font-size:clamp(1rem,1.65vw,1.16rem);color:#A8A8B0;line-height:1.6}
+.hero-sub em{font-style:normal;color:#fff;font-weight:600}
+.cta{display:flex;flex-wrap:wrap;gap:11px;margin-top:38px}
+.btn{display:inline-flex;align-items:center;gap:9px;padding:14px 24px;border-radius:2px;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;text-decoration:none;transition:.18s;border:1px solid var(--line-2);color:#fff}
+.btn:hover{transform:translateY(-2px);border-color:#3B3B44;background:#0C0C0F}
+.btn-a{border:0;position:relative;background:#fff;color:#000;font-weight:600}
+.btn-a:hover{background:#EDEDF2}
+/* aurora dome */
+.dome{position:absolute;left:50%;transform:translateX(-50%);bottom:-320px;width:min(1500px,150vw);height:520px;border-radius:50%;background:radial-gradient(ellipse at 50% 0%,rgba(59,130,246,.42) 0%,rgba(34,197,94,.30) 32%,rgba(234,179,8,.20) 58%,rgba(249,115,22,.16) 76%,transparent 88%);filter:blur(58px);opacity:.62;pointer-events:none;z-index:1}
+
+/* TOTALS */
+.totals{border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--panel);position:relative;z-index:3}
+.totals-in{display:grid;grid-template-columns:repeat(4,1fr)}
+.tot{padding:32px 24px;border-right:1px solid var(--line)}
+.tot:first-child{padding-left:0}
+.tot:last-child{border-right:0;padding-right:0}
+.tot .n{font-size:clamp(1.65rem,3.2vw,2.5rem);font-weight:800;letter-spacing:-.038em;line-height:1}
+.tot .n small{font-size:.44em;font-weight:600;letter-spacing:-.01em;-webkit-text-fill-color:var(--mut);color:var(--mut)}
+.tot .l{margin-top:11px;color:var(--mut);font-size:13px;line-height:1.45}
+@media(max-width:820px){.totals-in{grid-template-columns:repeat(2,1fr)}.tot{border-bottom:1px solid var(--line);padding:24px 16px}.tot:nth-child(odd){padding-left:0}.tot:nth-child(2n){border-right:0;padding-right:0}.tot:nth-last-child(-n+2){border-bottom:0}}
+
+/* HEADS */
+.sec-head{display:flex;align-items:baseline;gap:16px;margin-bottom:42px;flex-wrap:wrap}
+.sec-head .tag{color:var(--mut)}
+.sec-head h2{font-size:clamp(1.55rem,3.1vw,2.35rem);font-weight:700;letter-spacing:-.035em;line-height:1.08}
+.sec-head .note{color:var(--mut);font-size:14px;max-width:40ch;margin-left:auto}
+
+/* LOOP */
+.loop{padding:92px 0 84px}
+.loopwrap{border:1px solid var(--line);background:var(--panel);position:relative}
+.loopwrap .specrule{position:absolute;top:0;left:0;right:0}
+.loopin{padding:34px clamp(18px,3vw,36px)}
+.loopgrid{display:grid;grid-template-columns:repeat(4,1fr)}
+.node{padding-right:22px}
+.node:last-child{padding-right:0}
+.node .cap{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.node .idx{width:26px;height:26px;flex:0 0 26px;border:1px solid var(--line-2);border-radius:50%;display:grid;place-items:center;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--mut)}
+.node .arw{flex:1;height:1px;background:var(--line-2)}
+.node.key .idx{border-color:transparent;background:var(--spec);color:#000;font-weight:600}
+.node.key .arw{background:var(--spec);opacity:.6}
+.node h3{font-size:1.02rem;font-weight:700;letter-spacing:-.022em;margin-bottom:8px}
+.node p{font-size:13.5px;color:var(--mut);line-height:1.55}
+.loopnote{margin-top:26px;padding-top:20px;border-top:1px solid var(--line);color:var(--mut);font-size:14px}
+.loopnote b{color:#fff;font-weight:600}
+@media(max-width:900px){.loopgrid{grid-template-columns:1fr;gap:22px}.node{padding-right:0}.node .arw{display:none}}
+
+/* ENTRIES */
+.log{padding:8px 0 92px}
+.entry{background:var(--panel);border:1px solid var(--line);margin-bottom:26px;position:relative;overflow:hidden}
+.entry .specrule{position:absolute;top:0;left:0;right:0;opacity:.55}
+.entry.owned .specrule{opacity:1}
+.entry-rail{border-bottom:1px solid var(--line);padding:14px clamp(18px,2.6vw,30px);display:flex;flex-wrap:wrap;gap:7px 20px;align-items:center;color:var(--mut-2)}
+.entry-rail b{color:#DADADF;font-weight:500}
+.entry-rail .id{color:#fff;font-weight:500}
+.ebody{padding:32px clamp(18px,2.6vw,30px) 28px}
+.entry h3{font-size:clamp(1.4rem,2.7vw,1.95rem);font-weight:800;letter-spacing:-.035em;line-height:1.1}
+.kick{color:var(--mut-2);margin:8px 0 26px;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.06em;text-transform:uppercase}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:0 40px;margin-bottom:26px}
+.blk .lbl{color:var(--mut-2);margin-bottom:9px;display:block}
+.blk p{font-size:15.5px;line-height:1.62;color:#B4B4BC}
+.blk p strong{color:#fff;font-weight:600}
+@media(max-width:760px){.pair{grid-template-columns:1fr;gap:22px}}
+
+/* METRICS */
+.mstrip{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin:2px 0 24px}
+.mstrip.two{grid-template-columns:repeat(2,1fr)}
+.m{padding:20px 22px 20px 0;border-right:1px solid var(--line)}
+.m:last-child{border-right:0}
+.m .v{font-size:clamp(1.25rem,2.3vw,1.75rem);font-weight:800;letter-spacing:-.038em;line-height:1}
+.m .v small{font-size:.5em;font-weight:600;-webkit-text-fill-color:var(--mut);color:var(--mut)}
+.m .k{margin-top:9px;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--mut-2)}
+@media(max-width:640px){.mstrip,.mstrip.two{grid-template-columns:1fr}.m{border-right:0;border-bottom:1px solid var(--line);padding:16px 0}.m:last-child{border-bottom:0}}
+
+/* FIGURES */
+.fig{margin:2px 0 24px;padding:24px;background:var(--panel-2);border:1px solid var(--line)}
+.fig-t{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--mut-2);margin-bottom:20px}
+.fig-cap{margin-top:18px;padding-top:15px;border-top:1px solid var(--line);font-size:14px;color:var(--mut);line-height:1.55}
+
+/* time bars */
+.tbar{display:grid;grid-template-columns:76px 1fr;align-items:center;gap:14px;margin-bottom:12px}
+.tbar .who{font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.1em;color:var(--mut-2);text-transform:uppercase}
+.tbar .track{position:relative;height:32px;background:#121216}
+.tbar .fill{height:100%;display:flex;align-items:center;padding-left:13px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:#fff;white-space:nowrap;width:0;transition:width 1.15s cubic-bezier(.2,.8,.3,1)}
+.tbar.before .fill{background:#25252C}
+.tbar.after .fill{background:var(--spec)}
+.in .tbar.before .fill{width:100%}
+.in .tbar.after .fill{width:7%}
+.tbar.after .fill i{position:absolute;left:calc(7% + 14px);font-style:normal;color:#fff;font-family:'IBM Plex Mono',monospace;font-size:11.5px}
+
+/* flow */
+.flow{display:flex;flex-wrap:wrap}
+.step{flex:1;min-width:130px;padding:16px 14px;border:1px solid var(--line);border-right:0;background:#0A0A0C}
+.step:last-child{border-right:1px solid var(--line)}
+.step.hot{background:#111116;border-top:1px solid transparent;box-shadow:inset 0 2px 0 0 #22C55E}
+.step .sn{font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.14em;color:var(--mut-2);text-transform:uppercase;margin-bottom:8px}
+.step .st{font-size:13.5px;font-weight:600;color:#fff;line-height:1.32}
+.step .sm{font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--mut-2);margin-top:8px}
+.step.hot .sm{color:#22C55E}
+@media(max-width:700px){.step{min-width:100%;border-right:1px solid var(--line);border-bottom:0}.step:last-child{border-bottom:1px solid var(--line)}}
+
+/* sweep */
+.sweep{font-family:'IBM Plex Mono',monospace;font-size:11.5px;background:#000;border:1px solid var(--line)}
+.sweep-h{display:flex;justify-content:space-between;align-items:center;padding:11px 15px;border-bottom:1px solid var(--line);color:var(--mut-2);font-size:10px;letter-spacing:.14em;text-transform:uppercase}
+.sweep-h b{color:#fff;font-weight:500}
+.row{display:flex;align-items:center;gap:12px;padding:9px 15px;border-bottom:1px solid #0F0F13;color:var(--mut)}
+.row .nmc{flex:1}
+.row.flag .nmc{color:#fff}
+.pill{font-size:9.5px;letter-spacing:.09em;padding:3px 9px;text-transform:uppercase}
+.pill.ok{background:#111116;color:var(--mut-2)}
+.pill.bad{background:rgba(249,115,22,.16);color:#F97316}
+.sweep-f{padding:10px 15px;color:var(--mut-2);font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;border-top:1px solid var(--line)}
+
+/* entity */
+.ent{display:grid;grid-template-columns:1fr auto 1fr;gap:20px;align-items:center}
+.ent .col{display:flex;flex-direction:column;gap:9px}
+.chipm{border:1px solid var(--line-2);padding:12px 14px;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.07em;color:var(--mut);background:#0A0A0C;text-transform:uppercase}
+.chipm.core{background:#fff;color:#000;border-color:#fff;text-align:center;padding:20px 16px;font-size:11px;letter-spacing:.11em;font-weight:500;line-height:1.6}
+.ent .mid{font-family:'IBM Plex Mono',monospace;font-size:18px;color:var(--mut-2)}
+@media(max-width:700px){.ent{grid-template-columns:1fr;gap:14px}.ent .mid{text-align:center}}
+
+/* funnel */
+.fun{display:flex;flex-direction:column;gap:7px;align-items:center}
+.fseg{width:100%;max-width:520px;padding:14px 18px;background:#0F0F13;border:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;font-size:13.5px;color:#B4B4BC}
+.fseg .fl{font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--mut-2)}
+.fseg.leak{background:#000;border-color:transparent;box-shadow:inset 3px 0 0 0 #F97316,inset 0 0 0 1px var(--line-2);color:#fff;font-weight:600}
+.fseg.leak .fl{color:#F97316}
+.fseg.s2{max-width:462px}.fseg.s3{max-width:404px}.fseg.s4{max-width:346px}
+
+/* timeline */
+.tl-line{height:1px;background:var(--spec);margin:36px 0 0;opacity:.75}
+.tl-marks{display:flex;justify-content:space-between;margin-top:-44px}
+.tl-m{flex:1;padding-right:14px}
+.tl-m:last-child{padding-right:0;text-align:right}
+.tl-m .mn{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.13em;color:var(--mut-2);text-transform:uppercase;margin-bottom:7px}
+.tl-m .mt{font-size:13.5px;font-weight:500;color:#DADADF;line-height:1.35}
+.tl-m.end .mt{color:#fff;font-weight:700}
+@media(max-width:700px){.tl-marks{flex-direction:column;gap:18px;margin-top:14px}.tl-m{text-align:left!important;padding-right:0}.tl-line{display:none}}
+
+/* chips */
+.stack{display:flex;flex-wrap:wrap;gap:7px}
+.chip{font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;padding:7px 11px;border:1px solid var(--line);color:var(--mut);background:#0A0A0C}
+
+/* details */
+details{border-top:1px solid var(--line);margin-top:24px;padding-top:16px}
+summary{cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--mut-2);list-style:none;display:flex;align-items:center;gap:9px;transition:color .16s}
+summary:hover{color:#fff}
+summary::-webkit-details-marker{display:none}
+summary::before{content:'+';font-size:14px;line-height:1;color:#22C55E}
+details[open] summary::before{content:'–'}
+details .dc{padding-top:16px}
+details .dc p{font-size:15px;line-height:1.62;color:#A8A8B0;margin-bottom:12px}
+details .dc .lbl{color:var(--mut-2);display:block;margin:20px 0 8px}
+details .dc .lbl:first-child{margin-top:0}
+
+.diff{margin-top:22px;padding:18px 20px;background:#0C0C0F;border:1px solid var(--line);border-left:2px solid #F97316}
+.diff .lbl{color:var(--mut-2);display:block;margin-bottom:7px}
+.diff p{font-size:14.5px;line-height:1.58;color:#B4B4BC}
+
+/* side */
+.side{padding:0 0 84px}
+.side-in{border:1px solid var(--line);background:var(--panel);padding:32px clamp(20px,3vw,32px);display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,2fr);gap:32px}
+.side .lbl{color:var(--mut-2);display:block;margin-bottom:11px}
+.side h3{font-size:1.2rem;font-weight:700;letter-spacing:-.03em;line-height:1.18;margin-bottom:16px}
+.side p{color:#A8A8B0;font-size:15px;line-height:1.6}
+@media(max-width:820px){.side-in{grid-template-columns:1fr;gap:20px}}
+
+/* essay */
+.essay{padding:92px 0;border-top:1px solid var(--line);background:var(--panel)}
+.egrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.55fr);gap:54px}
+.essay h2{font-size:clamp(1.6rem,3.2vw,2.4rem);font-weight:700;letter-spacing:-.038em;line-height:1.08;margin-top:16px}
+.essay .lede{color:var(--mut-2);margin-top:16px;font-size:14px;line-height:1.55;max-width:32ch}
+.essay p{font-size:16.5px;line-height:1.68;color:#B4B4BC;margin-bottom:18px}
+.essay p strong{color:#fff;font-weight:600}
+.pull{padding:2px 0 2px 20px;margin:28px 0;font-size:clamp(1.08rem,2vw,1.4rem);line-height:1.36;font-weight:600;letter-spacing:-.028em;color:#fff;position:relative}
+.pull::before{content:'';position:absolute;left:0;top:2px;bottom:2px;width:2px;background:var(--spec)}
+@media(max-width:860px){.egrid{grid-template-columns:1fr;gap:30px}}
+
+/* honest */
+.honest{padding:84px 0;border-top:1px solid var(--line)}
+.hgrid{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line)}
+.gp{padding:26px 24px 28px 0;border-right:1px solid var(--line)}
+.gp:last-child{border-right:0;padding-right:0}
+.gp .lbl{color:var(--mut-2);margin-bottom:12px;display:block}
+.gp p{font-size:14.5px;color:#A8A8B0;line-height:1.58}
+.honest .after{margin-top:30px;font-size:16px;color:#fff;max-width:60ch;line-height:1.6}
+@media(max-width:820px){.hgrid{grid-template-columns:1fr}.gp{border-right:0;border-bottom:1px solid var(--line);padding:22px 0 24px}.gp:last-child{border-bottom:0}}
+
+/* foot */
+.foot{border-top:1px solid var(--line);background:var(--panel);padding:88px 0 70px;position:relative;overflow:hidden}
+.foot .wrap{position:relative;z-index:2}
+.foot .dome{bottom:-400px;height:560px;opacity:.5}
+.foot h2{font-size:clamp(1.9rem,4.4vw,3.1rem);font-weight:800;letter-spacing:-.042em;line-height:1.02;max-width:18ch}
+.fgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;margin-top:44px;border-top:1px solid var(--line);padding-top:28px}
+.fc .lbl{color:var(--mut-2);display:block;margin-bottom:9px}
+.fc a,.fc span{color:#fff;text-decoration:none;font-size:15px;border-bottom:1px solid transparent;transition:.16s}
+.fc a:hover{border-color:#fff}
+.sign{margin-top:46px;color:var(--mut-2);font-size:11px;font-family:'IBM Plex Mono',monospace;letter-spacing:.08em}
+@media(max-width:820px){.fgrid{grid-template-columns:repeat(2,1fr)}}
+
+/* reveal */
+.rv{opacity:0;transform:translateY(20px);transition:opacity .7s cubic-bezier(.16,.84,.44,1),transform .7s cubic-bezier(.16,.84,.44,1)}
+.rv.in{opacity:1;transform:none}
+.hero h1,.hero .eyebrow,.hero .hero-sub,.hero .cta{opacity:0;animation:rise .85s cubic-bezier(.16,.84,.44,1) forwards}
+.hero .eyebrow{animation-delay:.06s}.hero h1{animation-delay:.16s}.hero .hero-sub{animation-delay:.32s}.hero .cta{animation-delay:.44s}
+@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+:focus-visible{outline:2px solid #22C55E;outline-offset:3px}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.rv{opacity:1;transform:none}.hero h1,.hero .eyebrow,.hero .hero-sub,.hero .cta{opacity:1}html{scroll-behavior:auto}.tbar.before .fill{width:100%}.tbar.after .fill{width:7%}}
+</style>
+</head>
+<body>
+
+<div class="rail"><div class="rail-in mono">
+  <span class="nm">Manas Ojha</span><span class="sp">/</span>
+  <span class="cur" id="cursor">Application — Builder, Founder's Office</span>
+</div></div>
+
+<header class="hero" data-cursor="Application — Builder, Founder's Office">
+  <div class="dome"></div>
+  <div class="wrap">
+    <div class="eyebrow mono">
+      <span>For <b>Deployment Inc</b></span><span>Founder's Office</span><span>Gurugram</span><span>Subject: I am your Builder</span>
+    </div>
+    <h1><span class="chrome">Forward-deployed for two years.</span><span class="l2">Nobody gave me the <span class="strike">title.</span></span></h1>
+    <p class="hero-sub">I sit inside teams that have a broken workflow they've stopped noticing, build the thing that fixes it, and stay until they actually use it. Ad operations across Southeast Asia. A vocational institute in eastern Uttar Pradesh. <em>Neither one asked me to.</em></p>
+    <div class="cta">
+      <a class="btn btn-a" href="#log">See the four deployments</a>
+      <a class="btn" href="https://drive.google.com/file/d/1oxf_tlSBagsUfsNF_YYhXyGfPjfNl9L3/view?usp=sharing" target="_blank" rel="noopener">Résumé (PDF)</a>
+    </div>
+  </div>
+</header>
+
+<div class="totals"><div class="wrap"><div class="totals-in">
+  <div class="tot rv"><div class="n chrome">2 hrs <small>→ 8 min</small></div><div class="l">Client report turnaround, after the tool replaced the process</div></div>
+  <div class="tot rv"><div class="n chrome">200 <small>/ day</small></div><div class="l">Campaigns swept by an agent each morning instead of by a person</div></div>
+  <div class="tot rv"><div class="n chrome">18 <small>months</small></div><div class="l">Loss-making institute to break-even. My P&amp;L.</div></div>
+  <div class="tot rv"><div class="n chrome">4 <small>systems</small></div><div class="l">Designed, built and shipped end to end, alone</div></div>
+</div></div></div>
+
+<!-- LOOP -->
+<section class="loop" data-cursor="The method — four domains, one loop">
+  <div class="wrap">
+    <div class="sec-head rv"><span class="tag mono">The method</span><h2>Four different domains. One loop.</h2><p class="note">The order matters more than any of the steps.</p></div>
+    <div class="loopwrap rv">
+      <hr class="specrule">
+      <div class="loopin">
+        <div class="loopgrid">
+          <div class="node"><div class="cap"><div class="idx">01</div><div class="arw"></div></div><h3>Sit inside the workflow</h3><p>Not a requirements doc. The Tuesday-afternoon version of the job, with the copy-paste and the file called final_v4.xlsx.</p></div>
+          <div class="node"><div class="cap"><div class="idx">02</div><div class="arw"></div></div><h3>Find the constraint</h3><p>People report the symptom that annoys them most. It's rarely the one costing the most. That gap is the work.</p></div>
+          <div class="node"><div class="cap"><div class="idx">03</div><div class="arw"></div></div><h3>Build into what exists</h3><p>No migration, no new login, no training deck. Slower to build. The only version that survives contact.</p></div>
+          <div class="node key"><div class="cap"><div class="idx">04</div><div class="arw"></div></div><h3>Own adoption</h3><p>A tool nobody opens is a tool that failed. The number that counts is whether it still runs six months later without me.</p></div>
+        </div>
+        <p class="loopnote"><b>Most internal tools die at step four</b> — and step four is the only one anybody actually feels.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LOG -->
+<section class="log" id="log">
+  <div class="wrap">
+    <div class="sec-head rv"><span class="tag mono">The log</span><h2>Four deployments.</h2><p class="note">Short version on the surface. Full log inside each, if you want it.</p></div>
+
+    <!-- 01 -->
+    <article class="entry rv" data-cursor="Deployment 01 — Post-campaign report engine">
+      <hr class="specrule">
+      <div class="entry-rail mono"><span class="id">Deployment 01</span><span>Site: <b>Ad ops, SEA</b></span><span>Status: <b>Production, v23+</b></span><span>Asked to build it: <b>No</b></span></div>
+      <div class="ebody">
+        <h3>The post-campaign report engine</h3>
+        <div class="kick">Internal forward deployment, before I knew that was a job title</div>
+        <div class="pair">
+          <div class="blk"><span class="lbl mono">The mess</span><p>Every campaign ended with the same tax: pull the numbers, retype them into a deck, write the insight, export. One to two hours a report, entirely manual, and I was accountable for 150+ of them across Southeast Asia.</p></div>
+          <div class="blk"><span class="lbl mono">The call</span><p>The obvious fix was a better template. The real constraint was that data assembly and thinking were tangled — the analyst couldn't start reasoning until the mechanical work was done. <strong>So I automated assembly and left judgment with the human.</strong></p></div>
+        </div>
+
+        <div class="fig rv">
+          <div class="fig-t">Time to produce one client report</div>
+          <div class="tbar before"><span class="who">Before</span><div class="track"><div class="fill">1–2 hours · fully manual</div></div></div>
+          <div class="tbar after"><span class="who">After</span><div class="track"><div class="fill"></div><i>5–10 minutes</i></div></div>
+          <p class="fig-cap">The saving isn't the point. The point is that the analyst now spends that time on the recommendation instead of retyping numbers into a slide.</p>
+        </div>
+
+        <div class="fig rv">
+          <div class="fig-t">What the tool actually does</div>
+          <div class="flow">
+            <div class="step"><div class="sn">Input</div><div class="st">Campaign CSV + brief</div><div class="sm">~60 sec</div></div>
+            <div class="step"><div class="sn">Parse</div><div class="st">Metrics, creatives, demographics</div><div class="sm">automatic</div></div>
+            <div class="step hot"><div class="sn">Layer</div><div class="st">AI insight vs benchmark</div><div class="sm">reviewed, not trusted</div></div>
+            <div class="step"><div class="sn">Render</div><div class="st">Branded slides + charts</div><div class="sm">automatic</div></div>
+            <div class="step"><div class="sn">Output</div><div class="st">Client-ready PDF</div><div class="sm">one click</div></div>
+          </div>
+          <p class="fig-cap">The insight step is a draft, not a decision — every line is checked before it reaches a client. A deliberate limit, not a missing feature.</p>
+        </div>
+
+        <div class="mstrip">
+          <div class="m"><div class="v chrome">150+</div><div class="k">Reports produced</div></div>
+          <div class="m"><div class="v chrome">3 <small>formats</small></div><div class="k">Display · CTV · Rich media</div></div>
+          <div class="m"><div class="v chrome">v23+</div><div class="k">Versions, all from real breakage</div></div>
+        </div>
+
+        <div class="stack"><span class="chip">HTML/JS</span><span class="chip">CSV parsing</span><span class="chip">Chart rendering</span><span class="chip">OpenAI API</span><span class="chip">Server-side proxy</span><span class="chip">PDF / Excel export</span></div>
+
+        <details><summary>Full log — architecture, validation, adoption</summary><div class="dc">
+          <span class="lbl mono">The second call, which mattered more</span>
+          <p>Browser-based. No install, no new system to log into. Harder to build and much harder to make robust — but the alternative was a beautiful internal tool with four users. Adoption was the constraint I designed against, not speed.</p>
+          <span class="lbl mono">What made it survive</span>
+          <p>A token-substitution build pipeline so the source template stays clean and rebuildable across format variants, and a validation layer — syntax checks, tag-balance parsing, leftover-token detection — that catches errors before anything reaches a client. Insights run through a server-side proxy rather than exposing keys in the browser.</p>
+          <p>It later extended to three ad formats, each with its own metrics, benchmarks and insight logic: standard display, connected TV, and rich media engagement.</p>
+          <span class="lbl mono">Adoption</span>
+          <p>It's now the standard way post-campaign reporting gets produced on the team — not a prototype somebody demoed once, but a tool other people's work depends on.</p>
+        </div></details>
+
+        <div class="diff"><span class="lbl mono">What I'd do differently</span><p>I built most of it before showing anyone, and got lucky. A rough version in front of two account managers in week one would have found what actually broke months earlier — twenty-three versions is a number I'm not entirely proud of.</p></div>
+      </div>
+    </article>
+
+    <!-- 02 -->
+    <article class="entry rv" data-cursor="Deployment 02 — Morning sweep agent">
+      <hr class="specrule">
+      <div class="entry-rail mono"><span class="id">Deployment 02</span><span>Site: <b>Ad ops, SEA</b></span><span>Coverage: <b>150–200 live campaigns</b></span><span>Runs: <b>Daily, unattended</b></span></div>
+      <div class="ebody">
+        <h3>The morning sweep agent</h3>
+        <div class="kick">Proof the first one wasn't a fluke</div>
+        <div class="pair">
+          <div class="blk"><span class="lbl mono">The mess</span><p>Every morning somebody read 150 to 200 live campaigns by hand to find the ones falling behind. One to two hours of the day before any actual work started — and because it depended on a person remembering, it slipped exactly when things were busiest.</p></div>
+          <div class="blk"><span class="lbl mono">The call</span><p><strong>Don't build a dashboard.</strong> A dashboard needs someone to look at it, and the failure mode here was precisely that nobody looked. Build something that runs on its own and speaks up only when something's wrong.</p></div>
+        </div>
+
+        <div class="fig rv">
+          <div class="fig-t">What lands each morning — recreated, sample data</div>
+          <div class="sweep">
+            <div class="sweep-h"><span>Morning sweep · 06:40</span><span><b>187 swept</b> · 4 behind pace</span></div>
+            <div class="row flag"><span class="nmc">Campaign A — push notification</span><span class="pill bad">62% of pace</span></div>
+            <div class="row flag"><span class="nmc">Campaign B — rich media</span><span class="pill bad">71% of pace</span></div>
+            <div class="row flag"><span class="nmc">Campaign C — display</span><span class="pill bad">Under-delivering D3</span></div>
+            <div class="row flag"><span class="nmc">Campaign D — CTV</span><span class="pill bad">CPM drift</span></div>
+            <div class="row"><span class="nmc">183 others</span><span class="pill ok">On pace — collapsed</span></div>
+            <div class="sweep-f">Shared to ops · account management · sales</div>
+          </div>
+          <p class="fig-cap">The design decision is the last row. Everything healthy collapses to a single line, so the only thing competing for attention is the thing that needs it.</p>
+        </div>
+
+        <div class="mstrip">
+          <div class="m"><div class="v chrome">150–200</div><div class="k">Campaigns swept daily</div></div>
+          <div class="m"><div class="v chrome">1–2 <small>hrs</small></div><div class="k">Returned to the team each morning</div></div>
+          <div class="m"><div class="v chrome">3 <small>teams</small></div><div class="k">Ops · account mgmt · sales</div></div>
+        </div>
+
+        <div class="stack"><span class="chip">Python</span><span class="chip">Playwright</span><span class="chip">Scheduled run</span><span class="chip">HTML digest</span></div>
+
+        <details><summary>Full log — why an agent and not a report</summary><div class="dc">
+          <p>The agent drives the reporting interface the way a person would, sweeps every live campaign, and compiles a single HTML digest shared across three teams. Same artifact for everyone, which removed a second problem I hadn't set out to solve — ops, account management and sales had been working from three different readings of the same numbers.</p>
+          <p>The check stopped depending on anyone's memory, which was the actual problem. The reading was never the hard part.</p>
+        </div></details>
+
+        <div class="diff"><span class="lbl mono">What I'd do differently</span><p>It drives a user interface, so it's brittle by construction — a layout change can break it silently, and silent failure is the worst possible outcome for a tool whose whole job is to speak up. Deploying this into a client's environment, I'd have pushed for API access up front rather than routing around the constraint.</p></div>
+      </div>
+    </article>
+
+    <!-- 03 -->
+    <article class="entry rv" data-cursor="Deployment 03 — Insertion order system">
+      <hr class="specrule">
+      <div class="entry-rail mono"><span class="id">Deployment 03</span><span>Site: <b>Commercial ops, multi-market</b></span><span>Users: <b>Sales + finance</b></span><span>Next market: <b>Indonesia</b></span></div>
+      <div class="ebody">
+        <h3>The insertion order system</h3>
+        <div class="kick">The one where the hard part was legal, not technical</div>
+        <div class="pair">
+          <div class="blk"><span class="lbl mono">The mess</span><p>Insertion orders — the contract that makes a campaign real — were built by hand in Word and Excel. Which meant duplicated order numbers, inconsistent terms, and every market's legal requirements depending on somebody remembering to change a field.</p></div>
+          <div class="blk"><span class="lbl mono">The call</span><p><strong>Treat the entity structure as the architecture</strong>, not as a set of templates. Get that right and a new market is configuration. Get it wrong and every new market is a rebuild.</p></div>
+        </div>
+
+        <div class="fig rv">
+          <div class="fig-t">Why it scales to a new market in days</div>
+          <div class="ent">
+            <div class="col">
+              <div class="chipm">Entity — India</div>
+              <div class="chipm">Entity — Singapore</div>
+              <div class="chipm">Entity — Indonesia</div>
+            </div>
+            <div class="mid">→</div>
+            <div class="col">
+              <div class="chipm core">One document engine<br>Terms · numbering · signatures</div>
+              <div class="chipm">Sales login · finance login</div>
+              <div class="chipm">Agency auto-fill</div>
+            </div>
+          </div>
+          <p class="fig-cap">Each market's requirements are handled by structure, not by discipline. Order numbers are issued by the system, so the duplicate-number problem stops being possible rather than becoming someone's responsibility.</p>
+        </div>
+
+        <div class="mstrip two">
+          <div class="m"><div class="v chrome">2 <small>functions</small></div><div class="k">Sales and finance, one source</div></div>
+          <div class="m"><div class="v chrome">Indonesia</div><div class="k">Second market chartered</div></div>
+        </div>
+
+        <div class="stack"><span class="chip">Multi-entity model</span><span class="chip">Role-based access</span><span class="chip">PDF generation</span><span class="chip">Agency records</span></div>
+
+        <details><summary>Full log — the entity model</summary><div class="dc">
+          <p>Sales and finance log into the same system. Selecting an agency pulls its stored details; selecting a market applies that entity's legal terms and numbering series; campaign details go in once and the completed order renders to PDF ready to send.</p>
+          <p>The real test of the architecture was whether adding a second market cost weeks or days. It's the deployment I'd point to for whether I can build something meant to be handed to people I'll never meet.</p>
+        </div></details>
+
+        <div class="diff"><span class="lbl mono">What I'd do differently</span><p>I designed the entity model from the two markets I could see. I should have sat with the commercial lead for the third before writing any of it — the cost of guessing wrong on that layer is far higher than on anything built above it.</p></div>
+      </div>
+    </article>
+
+    <!-- 04 -->
+    <article class="entry owned rv" data-cursor="Deployment 04 — AVP ITI, Ballia">
+      <hr class="specrule">
+      <div class="entry-rail mono"><span class="id">Deployment 04</span><span>Site: <b>Avadh Vidya Private ITI, Ballia, UP</b></span><span>Scope: <b>Full operational charge</b></span><span>Owned: <b>The P&amp;L</b></span></div>
+      <div class="ebody">
+        <h3>The one where I owned the number, not the artifact</h3>
+        <div class="kick">Two years · four trades · 100+ students</div>
+        <div class="pair">
+          <div class="blk"><span class="lbl mono">The mess</span><p>A vocational institute in eastern Uttar Pradesh, losing money. The instinct in the room was that it was an awareness problem — not enough people know about us, so spend more on reaching them.</p></div>
+          <div class="blk"><span class="lbl mono">The call</span><p>It wasn't a top-of-funnel problem. The leak was inside admissions itself. Spending more on awareness would have poured people into a process already losing them — <strong>so I held marketing flat and rebuilt admissions first.</strong></p></div>
+        </div>
+
+        <div class="fig rv">
+          <div class="fig-t">Where the money was actually going</div>
+          <div class="fun">
+            <div class="fseg"><span>Enquiries arriving</span><span class="fl">Not the problem</span></div>
+            <div class="fseg leak s2"><span>Enquiry → application</span><span class="fl">The leak</span></div>
+            <div class="fseg s3"><span>Application → fees paid</span><span class="fl">Downstream</span></div>
+            <div class="fseg s4"><span>Enrolled and retained</span><span class="fl">Downstream</span></div>
+          </div>
+          <p class="fig-cap">Everyone was looking at the top of the funnel because that's the part you can buy your way out of. The unpopular call was to spend a quarter fixing the second stage while it looked like nothing was happening.</p>
+        </div>
+
+        <div class="fig rv">
+          <div class="fig-t">Eighteen months</div>
+          <div class="tl-line"></div>
+          <div class="tl-marks">
+            <div class="tl-m"><div class="mn">Month 0</div><div class="mt">Took operational charge. Loss-making.</div></div>
+            <div class="tl-m"><div class="mn">Diagnosis</div><div class="mt">Found the leak in admissions, not awareness</div></div>
+            <div class="tl-m"><div class="mn">Rebuild</div><div class="mt">Restructured the process. Marketing held flat.</div></div>
+            <div class="tl-m end"><div class="mn">Month 18</div><div class="mt">Break-even</div></div>
+          </div>
+          <p class="fig-cap">Most turnarounds aren't one big fix. They're finding the single process that's actually broken and being relentless about that one thing while everybody suggests other things.</p>
+        </div>
+
+        <div class="mstrip">
+          <div class="m"><div class="v chrome">18 <small>months</small></div><div class="k">To break-even</div></div>
+          <div class="m"><div class="v chrome">4 <small>trades</small></div><div class="k">Kept open through the turnaround</div></div>
+          <div class="m"><div class="v chrome">100+</div><div class="k">Students</div></div>
+        </div>
+
+        <details><summary>Full log — the people part, and the software that came after</summary><div class="dc">
+          <span class="lbl mono">What it actually took</span>
+          <p>Restructuring how enquiries were handled and converted, and managing both formal and non-formal staff through a change none of them had asked for. This part had no code in it at all. It was standing in a room in Ballia persuading people who had done it the same way for years.</p>
+          <span class="lbl mono">Then — and only then — the software</span>
+          <p>The fixed process needed a system to hold it, so I built the institute's ERP: admissions, a fee ledger, a payroll engine with sandwich-leave rules, two-tier permissions and student tracking. Next.js, TypeScript, Drizzle, Postgres. Designed, built and shipped alone.</p>
+          <p>The sequence is the point. I fixed the business first and wrote the software second. Doing it the other way round is the most common way this kind of project quietly fails.</p>
+        </div></details>
+
+        <div class="stack" style="margin-top:22px"><span class="chip">Next.js</span><span class="chip">TypeScript</span><span class="chip">Drizzle</span><span class="chip">Postgres</span><span class="chip">Payroll rules engine</span><span class="chip">Fee ledger</span></div>
+
+        <div class="diff"><span class="lbl mono">What I'd do differently</span><p>I under-communicated in the first two months. I had the diagnosis before the staff had any reason to trust it, and I treated their resistance as an obstacle rather than as information. The turnaround would have been faster if I'd spent the first three weeks listening instead of restructuring.</p></div>
+      </div>
+    </article>
+  </div>
+</section>
+
+<!-- SIDE -->
+<section class="side">
+  <div class="wrap"><div class="side-in rv">
+    <div><span class="lbl mono">Off the clock</span><h3>Cold domains, learned to the point of shipping</h3>
+      <div class="stack"><span class="chip">Remotion</span><span class="chip">ElevenLabs</span><span class="chip">WhisperX</span><span class="chip">vidIQ</span></div>
+    </div>
+    <div>
+      <p>Faceless YouTube channels built end to end: a soccer explainer with two animated characters and a JSON-driven episode pipeline, a history channel using parallax compositing over archival footage, a guided meditation series.</p>
+      <p style="margin-top:12px">Nobody assigned any of it. I picked domains I knew nothing about — animation, sound design, retention editing, thumbnail click-through — and learned each far enough to ship. Same muscle as walking into a client's business and being useful in week two.</p>
+    </div>
+  </div></div>
+</section>
+
+<!-- ESSAY -->
+<section class="essay" data-cursor="Why India's first AI FDE company matters to me">
+  <div class="wrap"><div class="egrid">
+    <div class="rv">
+      <span class="mono" style="color:var(--mut-2)">The second question</span>
+      <h2>Why India's first AI FDE company matters to me</h2>
+      <p class="lede">You asked for this in the post. It deserves more than a line, so here it is properly.</p>
+    </div>
+    <div class="rv">
+      <p><strong>The bottleneck for AI in Indian companies isn't the models.</strong> It's that the people who understand the problem can't specify the solution, and the people who can build it have never watched the problem happen.</p>
+      <p>I've been on both sides of that gap.</p>
+      <p>At an ad-tech company I watched teams describe what they needed and receive software that matched the description exactly and solved nothing — because the thing that was actually slow was never the thing anyone thought to mention. The tools that worked were the ones where somebody sat in the chair, did the job badly for a week, and then built. That isn't a methodology I read about. It's the only thing I've seen work.</p>
+      <p>At the institute I've seen the other end. A real business, with real inefficiency, in a town nobody is flying into to fix. The Indian mid-market is thousands of businesses like that one. They don't need a platform. They need someone to show up, understand what they do all day, and build into it.</p>
+      <div class="pull">Product-shaped software assumes the buyer can specify. Most of this market can't yet — and someone has to be the reference implementation.</div>
+      <p>That's not a gap in the software. It's a gap in deployment, and it's a category that doesn't exist here yet.</p>
+      </div>
+  </div></div>
+</section>
+
+<!-- HONEST -->
+<section class="honest" data-cursor="What I haven't done">
+  <div class="wrap">
+    <div class="sec-head rv"><span class="tag mono">Straight</span><h2>What I haven't done</h2><p class="note">You'll find these in ten minutes of conversation. Better that I say them first.</p></div>
+    <div class="hgrid">
+      <div class="gp rv"><span class="lbl mono">01</span><p>Every deployment above is internal or my own. I've never built into a paying client's environment, with their data, their security review and their politics.</p></div>
+      <div class="gp rv"><span class="lbl mono">02</span><p>I've never worked inside an AI-native company. I've built with these tools constantly, but always as the only person doing it — so my work has never been reviewed by someone better at it than me.</p></div>
+    </div>
+    <p class="after rv">What I'd argue transfers: I've done the unglamorous half of this job four times — the part after the demo, where you find out whether anyone actually uses the thing. That half doesn't change much when the logo on the door does.</p>
+  </div>
+</section>
+
+<footer class="foot" data-cursor="Contact">
+  <div class="dome"></div>
+  <div class="wrap">
+    <h2 class="rv"><span class="chrome">One title. No delegation.</span><br>Let's build.</h2>
+    <div class="fgrid rv">
+      <div class="fc"><span class="lbl mono">Email</span><a href="mailto:MANAS.MKO@GMAIL.COM">MANAS.MKO@GMAIL.COM</a></div>
+      <div class="fc"><span class="lbl mono">Phone</span><a href="tel:+918427247107">+91 84272 47107</a></div>
+      <div class="fc"><span class="lbl mono">LinkedIn</span><a href="https://www.linkedin.com/in/manas-ojha-4a5b9311b/">LinkedIn</a></div>
+      <div class="fc"><span class="lbl mono">Résumé</span><a href="https://drive.google.com/file/d/1oxf_tlSBagsUfsNF_YYhXyGfPjfNl9L3/view?usp=sharing" target="_blank" rel="noopener">Open Resume</a></div>
+    </div>
+    <div class="fgrid rv" style="border-top:0;padding-top:0;margin-top:24px">
+      <div class="fc"><span class="lbl mono">Location</span><span>Gurugram — Available to relocate</span></div>
+      <div class="fc"><span class="lbl mono">Made for</span><span>Deployment Inc</span></div>
+    </div>
+    <p class="sign">Diagrams are recreations. Client data and employer branding deliberately left out.</p>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var els=document.querySelectorAll('.rv');
+  if(reduce){els.forEach(function(e){e.classList.add('in')});}
+  else{
+    var io=new IntersectionObserver(function(en){en.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}})},{threshold:.1,rootMargin:'0px 0px -6% 0px'});
+    els.forEach(function(e){io.observe(e)});
+  }
+  var cursor=document.getElementById('cursor'),current='';
+  var co=new IntersectionObserver(function(en){en.forEach(function(e){if(e.isIntersecting){var t=e.target.getAttribute('data-cursor');if(t&&t!==current){current=t;cursor.textContent=t;}}})},{rootMargin:'-45% 0px -45% 0px'});
+  document.querySelectorAll('[data-cursor]').forEach(function(m){co.observe(m)});
+})();
+</script>
+</body>
+</html>
